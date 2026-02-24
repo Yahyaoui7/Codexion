@@ -1,6 +1,6 @@
 #include "codexion.h"
 
-static long now_ms()
+long now_ms()
 {
     struct timeval  tm;
     gettimeofday(&tm, NULL);
@@ -80,7 +80,6 @@ int init_coders(t_sim *sim)
     sim->coders = malloc(sizeof(t_coder) * n);
     if (!sim->coders)
         return 0;
-
     i = 0;
     while (i < n)
     {
@@ -92,7 +91,22 @@ int init_coders(t_sim *sim)
         sim->coders[i].right = &sim->dongles[(i + 1) % n];
 
         sim->coders[i].sim = sim;
+        if (pthread_mutex_init(&sim->coders[i].data_mutex, NULL) != 0)
+            break;
+        sim->coders[i].is_compiling = 0;
         i++;
+    }
+
+    if (i != n)
+    {
+        while (i > 0)
+        {
+            i--;
+            pthread_mutex_destroy(&sim->coders[i].data_mutex);
+        }
+        free(sim->coders);
+        sim->coders = NULL;
+        return (0);
     }
     return 1;
 }

@@ -39,6 +39,8 @@ struct s_coder
     int         id;
     int         compile_count;
     long        last_compile_start;
+    int         is_compiling ;
+    pthread_mutex_t data_mutex;
     pthread_t   thread;
     t_dongle    *left;
     t_dongle    *right;
@@ -56,16 +58,33 @@ struct s_sim
     t_dongle        *dongles;
 };
 
-/*            parser        */
-void    parser(char **av, t_data *data);
-
-/*            initialization         */
-int init_sim(t_sim *sim, t_data *cfg);
-int init_dongles(t_sim *sim);
-int init_coders(t_sim *sim);
-
 /*             cleanup          */
 void    destroy_dongles(t_sim *sim);
 void    destroy_sim(t_sim *sim);
+
+/*       coder      */
+void *coder_routine(void *arg);
+
+
+/*            init       */
+int init_sim(t_sim *sim, t_data *cfg);
+int init_dongles(t_sim *sim);
+int init_coders(t_sim *sim);
+long now_ms(void);
+
+/*        logging */
+int     sim_should_stop(t_sim *sim);
+void    sim_set_stop(t_sim *sim, int v);
+void    log_state(t_sim *sim, int id, const char *msg);
+void    log_burnout(t_sim *sim, int id);
+
+/*     moniter      */
+void *monitor_routine(void *arg);
+
+/*            parser        */
+void    parser(char **av, t_data *data);
+
+ /*     take_dongle       */
+int take_two_dongles(t_coder *c);
 
 #endif

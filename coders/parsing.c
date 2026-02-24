@@ -79,6 +79,11 @@ static int valid_argument(char *str, char *name, int i)
 void  parser(char **av, t_data *data)
 {
     data->number_of_coders = valid_argument(av[1], "number_of_coders", 1);
+    if(data->number_of_coders == 1)
+    {
+        printf("can't compaling\n");
+        exit(1);
+    }
     data->time_to_burnout = valid_argument(av[2],"time_to_burnout", 1);
     data->time_to_compile = valid_argument(av[3],"time_to_compile", 1);
     data->time_to_debug = valid_argument(av[4],"time_to_debug", 1);
