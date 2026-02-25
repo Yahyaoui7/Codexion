@@ -53,6 +53,9 @@ int init_dongles(t_sim *sim)
 
         sim->dongles[i].available = 1;
         sim->dongles[i].cooldown_until = 0;
+
+        sim->dongles[i].next_ticket = 0;
+        sim->dongles[i].serving_ticket = 0;
         i++;
     }
 

@@ -32,6 +32,9 @@ struct s_dongle
     int             available;
     long            cooldown_until;
 
+    unsigned long next_ticket;
+    unsigned long serving_ticket;
+
 };
 
 struct s_coder
@@ -80,11 +83,16 @@ void    log_burnout(t_sim *sim, int id);
 
 /*     moniter      */
 void *monitor_routine(void *arg);
+void wake_all_dongles(t_sim *sim);
 
 /*            parser        */
 void    parser(char **av, t_data *data);
 
  /*     take_dongle       */
 int take_two_dongles(t_coder *c);
+void release_dongle(t_sim *sim, t_dongle *d);
+
 
 #endif
+
+

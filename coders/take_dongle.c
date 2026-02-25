@@ -1,10 +1,13 @@
 
 #include "codexion.h"
 
+
 int take_dongle(t_sim *sim, t_dongle *d)
 {
     long now;
 
+    unsigned long my_ticket = d->next_ticket;
+    d->next_ticket++;
     pthread_mutex_lock(&d->mutex);
     while (1)
     {
@@ -14,7 +17,7 @@ int take_dongle(t_sim *sim, t_dongle *d)
             return (0);
         }
         now = now_ms();
-        if (d->available && now >= d->cooldown_until)
+        if ( my_ticket == d->serving_ticket && d->available && now >= d->cooldown_until)
             break;
         pthread_cond_wait(&d->cond, &d->mutex);
     }
@@ -25,14 +28,11 @@ int take_dongle(t_sim *sim, t_dongle *d)
 
 void release_dongle(t_sim *sim, t_dongle *d)
 {
-    long now;
-
-    now = now_ms();
     pthread_mutex_lock(&d->mutex);
 
     d->available = 1;
-    d->cooldown_until = now + sim->config.dongle_cooldown;
-
+    d->cooldown_until = now_ms() + sim->config.dongle_cooldown;
+    d->serving_ticket++;
     pthread_cond_broadcast(&d->cond);
     pthread_mutex_unlock(&d->mutex);
 }
@@ -43,8 +43,6 @@ int take_two_dongles(t_coder *c)
     t_dongle *a;
     t_dongle *b;
 
-    if (!c->right)
-        return (0);
 
     a = c->left;
     b = c->right;

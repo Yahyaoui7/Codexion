@@ -1,24 +1,18 @@
 #include "codexion.h"
 
-static void wake_all_dongles(t_sim *sim)
+void wake_all_dongles(t_sim *sim)
 {
-    int j;
-    int n;
+    int i;
 
-    if (!sim->dongles)
-        return;
-    n = sim->config.number_of_coders;
-    j = 0;
-    while (j < n)
+    i = 0;
+    while (i < sim->config.number_of_coders)
     {
-        pthread_mutex_lock(&sim->dongles[j].mutex);
-        pthread_cond_broadcast(&sim->dongles[j].cond);
-        pthread_mutex_unlock(&sim->dongles[j].mutex);
-        j++;
+        pthread_mutex_lock(&sim->dongles[i].mutex);
+        pthread_cond_broadcast(&sim->dongles[i].cond);
+        pthread_mutex_unlock(&sim->dongles[i].mutex);
+        i++;
     }
 }
-
-
 
 static int all_finished(t_sim *sim)
 {
@@ -90,7 +84,9 @@ void *monitor_routine(void *arg)
             return (NULL);
         }
 
-        usleep(10000);
+        usleep(1000);
     }
     return (NULL);
 }
+
+

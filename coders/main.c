@@ -23,11 +23,11 @@ int init_all(t_sim *sim, t_data *cfg)
 
 int main(int ac, char **av)
 {
-    t_data  data;
-    t_sim   sim;
-    pthread_t mon;
-    int     i;
-    int     n;
+    t_data      data;
+    t_sim       sim;
+    pthread_t   mon;
+    int         i;
+    int         n;
 
     if (ac != 9)
         return (printf("Error: wrong number of arguments\n"), 1);
@@ -39,8 +39,6 @@ int main(int ac, char **av)
         return (printf("Error: init failed\n"), 1);
 
     n = sim.config.number_of_coders;
-
-    /* 1) create coder threads */
     i = 0;
     while (i < n)
     {
@@ -49,11 +47,10 @@ int main(int ac, char **av)
         i++;
     }
 
-    /* if coder creation failed */
     if (i != n)
     {
         sim_set_stop(&sim, 1);
-        /* join the coders that were already created */
+        wake_all_dongles(&sim);
         while (i > 0)
         {
             i--;
@@ -63,10 +60,10 @@ int main(int ac, char **av)
         return (printf("Error: pthread_create failed\n"), 1);
     }
 
-    /* 2) create monitor thread (after coders) */
     if (pthread_create(&mon, NULL, monitor_routine, &sim) != 0)
     {
         sim_set_stop(&sim, 1);
+        wake_all_dongles(&sim);
         i = 0;
         while (i < n)
         {
@@ -77,7 +74,8 @@ int main(int ac, char **av)
         return (printf("Error: monitor pthread_create failed\n"), 1);
     }
 
-    /* 3) join coders */
+    pthread_join(mon, NULL);
+
     i = 0;
     while (i < n)
     {
@@ -85,13 +83,7 @@ int main(int ac, char **av)
         i++;
     }
 
-    /* 4) join monitor */
-    pthread_join(mon, NULL);
-
-    /* 5) cleanup */
     destroy_sim(&sim);
     return (0);
 }
-
-
 
