@@ -1,37 +1,42 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cleanup.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nyahyaou <nyahyaou@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/26 13:50:35 by nyahyaou          #+#    #+#             */
+/*   Updated: 2026/02/27 00:37:21 by nyahyaou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-void    destroy_dongles(t_sim *sim)
+void	destroy_dongles(t_sim *sim)
 {
-    int i;
-    int n;
+	int	i;
+	int	n;
 
-    if (!sim->dongles)
-        return ;
-    n = sim->config.number_of_coders;
-    i = 0;
-    while (i < n)
-    {
-        pthread_mutex_destroy(&sim->dongles[i].mutex);
-        pthread_cond_destroy(&sim->dongles[i].cond);
-        i++;
-    }
+	if (!sim->dongles)
+		return ;
+	n = sim->config.number_of_coders;
+	i = 0;
+	while (i < n)
+	{
+		pthread_mutex_destroy(&sim->dongles[i].mutex);
+		pthread_cond_destroy(&sim->dongles[i].cond);
+		i++;
+	}
 }
 
-void    destroy_sim(t_sim *sim)
+void	destroy_sim(t_sim *sim)
 {
-    if (!sim)
-        return ;
-
-    /* dongles */
-    destroy_dongles(sim);
-    free(sim->dongles);
-    sim->dongles = NULL;
-
-    /* coders */
-    free(sim->coders);
-    sim->coders = NULL;
-
-    /* sim mutexes */
-    pthread_mutex_destroy(&sim->log_mutex);
-    pthread_mutex_destroy(&sim->stop_mutex);
+	if (!sim)
+		return ;
+	destroy_dongles(sim);
+	free(sim->dongles);
+	sim->dongles = NULL;
+	free(sim->coders);
+	pthread_mutex_destroy(&sim->log_mutex);
+	pthread_mutex_destroy(&sim->stop_mutex);
 }
