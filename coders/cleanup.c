@@ -40,3 +40,12 @@ void	destroy_sim(t_sim *sim)
 	pthread_mutex_destroy(&sim->log_mutex);
 	pthread_mutex_destroy(&sim->stop_mutex);
 }
+
+void	heap_destroy(t_heap *q)
+{
+	free(q->arr);
+	q->arr = NULL;
+	q->size = 0;
+	q->capacity = 0;
+	q->seq = 0;
+}

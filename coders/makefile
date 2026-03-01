@@ -4,7 +4,8 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread -g
 
 SRC = cleanup.c init.c main.c parsing.c coder.c logging.c \
-		 take_dongle.c monitor.c manager.c init_utils.c
+		 take_dongle.c monitor.c manager.c init_utils.c \
+		 heap.c
 OBJ = $(SRC:.c=.o)
 
 all: $(NAME)

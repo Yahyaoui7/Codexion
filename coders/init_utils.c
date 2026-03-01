@@ -25,13 +25,18 @@ int	init_dongles_utils(int i, int n, t_sim *sim)
 		}
 		sim->dongles[i].available = 1;
 		sim->dongles[i].cooldown_until = 0;
-		sim->dongles[i].next_ticket = 0;
-		sim->dongles[i].serving_ticket = 0;
+		if (!heap_init(&sim->dongles[i].queue, n))
+		{
+			pthread_cond_destroy(&sim->dongles[i].cond);
+			pthread_mutex_destroy(&sim->dongles[i].mutex);
+			break ;
+		}
 	}
 	if (i != n)
 	{
 		while (i-- > 0)
 		{
+			heap_destroy(&sim->dongles[i].queue);
 			pthread_mutex_destroy(&sim->dongles[i].mutex);
 			pthread_cond_destroy(&sim->dongles[i].cond);
 		}
@@ -67,5 +72,16 @@ int	init_coders_utils(int n, t_sim *sim)
 		sim->coders = NULL;
 		return (0);
 	}
+	return (1);
+}
+
+int	heap_init(t_heap *q, int n)
+{
+	q->capacity = n;
+	q->size = 0;
+	q->seq = 0;
+	q->arr = malloc(sizeof(t_request) * n);
+	if (!q->arr)
+		return (0);
 	return (1);
 }
