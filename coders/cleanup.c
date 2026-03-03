@@ -12,6 +12,14 @@
 
 #include "codexion.h"
 
+void	heap_destroy(t_heap *q)
+{
+	free(q->arr);
+	q->arr = NULL;
+	q->size = 0;
+	q->capacity = 0;
+}
+
 void	destroy_dongles(t_sim *sim)
 {
 	int	i;
@@ -23,6 +31,7 @@ void	destroy_dongles(t_sim *sim)
 	i = 0;
 	while (i < n)
 	{
+		heap_destroy(&sim->dongles[i].queue);
 		pthread_mutex_destroy(&sim->dongles[i].mutex);
 		pthread_cond_destroy(&sim->dongles[i].cond);
 		i++;
@@ -39,13 +48,4 @@ void	destroy_sim(t_sim *sim)
 	free(sim->coders);
 	pthread_mutex_destroy(&sim->log_mutex);
 	pthread_mutex_destroy(&sim->stop_mutex);
-}
-
-void	heap_destroy(t_heap *q)
-{
-	free(q->arr);
-	q->arr = NULL;
-	q->size = 0;
-	q->capacity = 0;
-	q->seq = 0;
 }

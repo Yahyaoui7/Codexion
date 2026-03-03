@@ -12,9 +12,12 @@
 
 #include "codexion.h"
 
-int	init_dongles_utils(int i, int n, t_sim *sim)
+int	init_dongles_utils(int n, t_sim *sim)
 {
-	while (++i < n)
+	int	i;
+
+	i = 0;
+	while (i < n)
 	{
 		if (pthread_mutex_init(&sim->dongles[i].mutex, NULL))
 			break ;
@@ -31,19 +34,9 @@ int	init_dongles_utils(int i, int n, t_sim *sim)
 			pthread_mutex_destroy(&sim->dongles[i].mutex);
 			break ;
 		}
+		i++;
 	}
-	if (i != n)
-	{
-		while (i-- > 0)
-		{
-			heap_destroy(&sim->dongles[i].queue);
-			pthread_mutex_destroy(&sim->dongles[i].mutex);
-			pthread_cond_destroy(&sim->dongles[i].cond);
-		}
-		free(sim->dongles);
-		return (sim->dongles = NULL, 0);
-	}
-	return (1);
+	return (i);
 }
 
 int	init_coders_utils(int n, t_sim *sim)
@@ -79,7 +72,6 @@ int	heap_init(t_heap *q, int n)
 {
 	q->capacity = n;
 	q->size = 0;
-	q->seq = 0;
 	q->arr = malloc(sizeof(t_request) * n);
 	if (!q->arr)
 		return (0);

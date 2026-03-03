@@ -41,13 +41,24 @@ int	init_sim(t_sim *sim, t_data *cfg)
 int	init_dongles(t_sim *sim)
 {
 	int	n;
+	int	i;
 
 	n = sim->config.number_of_coders;
 	sim->dongles = malloc(sizeof(t_dongle) * n);
 	if (!sim->dongles)
 		return (0);
-	if (!init_dongles_utils(-1, n, sim))
-		return (0);
+	i = init_dongles_utils(n, sim);
+	if (i != n)
+	{
+		while (i-- > 0)
+		{
+			heap_destroy(&sim->dongles[i].queue);
+			pthread_mutex_destroy(&sim->dongles[i].mutex);
+			pthread_cond_destroy(&sim->dongles[i].cond);
+		}
+		free(sim->dongles);
+		return (sim->dongles = NULL, 0);
+	}
 	return (1);
 }
 

@@ -31,13 +31,13 @@ struct						s_request
 {
 	int						coder_id;
 	long					priority;
+	long					seq;
 };
 
 struct						s_heap
 {
 	t_request				*arr;
 	int						size;
-	long					seq;
 	int						capacity;
 };
 
@@ -59,6 +59,7 @@ struct						s_dongle
 	pthread_cond_t			cond;
 	int						available;
 	long					cooldown_until;
+	long					ticket_counter;
 	t_heap					queue;
 };
 
@@ -89,6 +90,7 @@ struct						s_sim
 /*             cleanup          */
 void						destroy_dongles(t_sim *sim);
 void						destroy_sim(t_sim *sim);
+void						heap_destroy(t_heap *q);
 
 /*       coder      */
 void						*coder_routine(void *arg);
@@ -100,8 +102,9 @@ int							init_coders(t_sim *sim);
 long						now_ms(void);
 
 /*            init_utils       */
-int							init_dongles_utils(int i, int n, t_sim *sim);
+int							init_dongles_utils(int n, t_sim *sim);
 int							init_coders_utils(int n, t_sim *sim);
+int							heap_init(t_heap *q, int n);
 
 /*        logging               */
 int							sim_should_stop(t_sim *sim);
@@ -123,11 +126,19 @@ void						release_dongle(t_sim *sim, t_dongle *d);
 /*       manger*/
 void						manger(t_sim *sim);
 
-int							heap_init(t_heap *q, int n);
-void						heap_destroy(t_heap *q);
-
+/*              heap                 */
 int							heap_push(t_heap *q, t_request r);
+int							less_req(t_request a, t_request b);
+void						swap_req(t_request *a, t_request *b);
+
+/*          heao_utils        */
 int							heap_pop(t_heap *q, t_request *out);
 int							heap_peek(t_heap *q, t_request *out);
-int							heap_remove_by_id(t_heap *q, int coder_id);
+
+/*            take_dongel_utils     */
+void						wait_until_ms(pthread_cond_t *cond,
+								pthread_mutex_t *mtx, long abs_ms);
+long						get_req_priority(t_coder *c);
+void						release_dongle(t_sim *sim, t_dongle *d);
+
 #endif
