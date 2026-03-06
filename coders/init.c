@@ -57,7 +57,8 @@ int	init_dongles(t_sim *sim)
 			pthread_cond_destroy(&sim->dongles[i].cond);
 		}
 		free(sim->dongles);
-		return (sim->dongles = NULL, 0);
+		sim->dongles = NULL;
+		return (0);
 	}
 	return (1);
 }
