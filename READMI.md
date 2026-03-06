@@ -249,6 +249,5 @@ AI tools were used for:
 
 * Understanding concurrency concepts
 * Improving documentation clarity
-* Generating README structure
 
-All code logic and implementation decisions were designed and validated manually.
+
